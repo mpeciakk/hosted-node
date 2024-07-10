@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  app:
+    image: oven/bun:1
+    command: sh -c "apt update && apt install git curl -y && curl -SL https://github.com/docker/compose/releases/download/v2.27.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose && bun install && bun run dev"
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /Users/m/Projects/hosted/hosted-backend/test/:/Users/m/Projects/hosted/hosted-backend/test/
+    ports:
+      - "3001:3001"
