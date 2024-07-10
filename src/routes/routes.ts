@@ -28,10 +28,11 @@ type DeployData = {
 router.post("/deploy", async (req: Request<{}, {}, DeployData>, res) => {
   const { url, branch, composeFile, variables } = req.body
 
-  deploy(url, branch, composeFile, variables)
+  const id = deploy(url, branch, composeFile, variables)
 
   res.status(200).json({
     status: "ok",
+    id: id
   })
 })
 

@@ -19,34 +19,37 @@ export async function getDeploymentStatus(deploymentId: string) {
 }
 
 export async function deploy(url: string, branch: string, composeFile: string, variables: EnvironmentVariable[]) {
+  const id = Date.now().toString()
   const name = basename(url)
   const path = `${process.env.DEPLOY_DIR}${name}-${branch}`
 
-  log(name, `Deploying repo ${url} as ${name} to ${path}`)
+  log(id, `Deploying repo ${url} as ${name} (${id}) to ${path}`)
 
-  deployments[name] = "in progress"
+  deployments[id] = "in progress"
 
   function onError(reason: string) {
-    log(name, `ERROR ${reason}`)
-    deployments[name] = "errored"
+    log(id, `ERROR ${reason}`)
+    deployments[id] = "errored"
   }
 
   if (await Bun.file(`${path}/${composeFile}`).exists()) {
-    log(name, "Pulling repo")
+    log(id, "Pulling repo")
     await pullRepo(url, path, branch, onError)
   } else {
-    log(name, "Cloning repo")
+    log(id, "Cloning repo")
     await cloneRepo(url, path, branch, onError)
   }
 
   const envPath = `${path}/.env`
   prepareEnvFile(envPath, variables)
 
-  log(name, "Compose pull")
-  await composePull(name, `${path}/${composeFile}`, onError)
+  log(id, "Compose pull")
+  await composePull(id, `${path}/${composeFile}`, onError)
 
-  log(name, "Compose up")
-  await composeUp(name, `${path}/${composeFile}`, envPath, onError)
+  log(id, "Compose up")
+  await composeUp(id, `${path}/${composeFile}`, envPath, onError)
 
-  deployments[name] = "deployed"
+  deployments[id] = "deployed"
+
+  return id
 }
