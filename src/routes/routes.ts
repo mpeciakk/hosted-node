@@ -28,7 +28,7 @@ type DeployData = {
 router.post("/deploy", async (req: Request<{}, {}, DeployData>, res) => {
   const { url, branch, composeFile, variables } = req.body
 
-  const id = deploy(url, branch, composeFile, variables)
+  const id = await deploy(url, branch, composeFile, variables)
 
   res.status(200).json({
     status: "ok",
@@ -40,7 +40,7 @@ router.get("/status/:id", async (req, res) => {
   const id = req.params.id
 
   res.status(200).json({
-    status: getDeploymentStatus(id),
+    status: await getDeploymentStatus(id),
     log: getLogs(id),
   })
 })
